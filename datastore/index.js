@@ -9,15 +9,24 @@ var items = {};
 
 exports.create = (text, callback) => {
   var id = counter.getNextUniqueId();
-  items[id] = text;
+  // items[id] = text;
+  let fileName = __dirname + '/dataDir/' + id;
+  fs.writeFile(fileName, text);
   callback(null, { id, text });
 };
 
 exports.readAll = (callback) => {
   var data = [];
-  _.each(items, (text, id) => {
-    data.push({ id, text });
+  fs.readdir(__dirname + '/dataDir', (err, files) => {
+    _.each(files, file => {
+      fs.readFile(__dirname + '/dataDir/' + file, (err, fileData) => {
+        data.push({ id: file, text: fileData });
+      });
+    });
   });
+  // _.each(items, (text, id) => {
+  //   data.push({ id, text });
+  // });
   callback(null, data);
 };
 
