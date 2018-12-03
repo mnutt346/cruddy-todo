@@ -31,7 +31,6 @@ exports.readAll = (callback) => {
         data.push({ id: file.slice(0, -4), text: fileData.toString() });
         // console.log('---IN EACH--- Data: ', data);
         if (index === files.length - 1) {
-          console.log('Inside if - data: ', data);
           callback(null, data);
         }
       });
@@ -40,29 +39,30 @@ exports.readAll = (callback) => {
       callback(null, data);
     }
   });
-  // _.each(items, (text, id) => {
-  //   data.push({ id, text });
-  // });
-
 };
 
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  fs.readdir(__dirname + '/dataDir', (err, files) => {
+    if (files.includes(id + '.txt')) {
+      fs.readFile(__dirname + '/dataDir/' + id + '.txt', (err, fileData) => {
+        callback(null, { id, text: fileData.toString() });
+      });
+    } else {
+      callback(new Error(`No item with id: ${id}`));
+    }
+  });
 };
 
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+  fs.readdir(__dirname + '/dataDir', (err, files) => {
+    if (files.includes(id + '.txt')) {
+      fs.writeFile(__dirname + '/dataDir/' + id + '.txt', text, (err) => {
+        callback(null, { id, text });
+      });
+    } else {
+      callback(new Error(`No item with id: ${id}`));
+    }
+  });
 };
 
 exports.delete = (id, callback) => {
