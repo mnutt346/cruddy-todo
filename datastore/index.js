@@ -26,17 +26,24 @@ exports.readAll = (callback) => {
   var data = [];
   // console.log('Inside readAll');
   fs.readdir(__dirname + '/dataDir', (err, files) => {
-    // console.log(err, files);
-    _.each(files, file => {
+    _.each(files, (file, index) => {
       fs.readFile(__dirname + '/dataDir/' + file, (err, fileData) => {
-        data.push({ id: file, text: fileData });
+        data.push({ id: file.slice(0, -4), text: fileData.toString() });
+        // console.log('---IN EACH--- Data: ', data);
+        if (index === files.length - 1) {
+          console.log('Inside if - data: ', data);
+          callback(null, data);
+        }
       });
     });
+    if (files.length === 0) {
+      callback(null, data);
+    }
   });
   // _.each(items, (text, id) => {
   //   data.push({ id, text });
   // });
-  callback(null, data);
+
 };
 
 exports.readOne = (id, callback) => {
