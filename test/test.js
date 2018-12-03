@@ -6,8 +6,8 @@ const counter = require('../datastore/counter.js');
 const todos = require('../datastore/index.js');
 
 const initializeTestFiles = () => {
-  counter.counterFile = path.join(__dirname, './counterTest.txt');
-  todos.dataDir = path.join(__dirname, 'testData');
+  counter.counterFile = path.join(__dirname, '../datastore/counter.txt');
+  todos.dataDir = path.join(__dirname, '../datastore/dataDir');
   todos.initialize();
 };
 
@@ -80,6 +80,7 @@ describe('todos', () => {
 
     it('should use the generated unique id as the filename', (done) => {
       fs.writeFileSync(counter.counterFile, '00142');
+      //console.log('counter.counterfile: ', counter.counterFile);
       todos.create('buy fireworks', (err, todo) => {
         const todoExists = fs.existsSync(path.join(todos.dataDir, '00143.txt'));
         expect(todoExists).to.be.true;
