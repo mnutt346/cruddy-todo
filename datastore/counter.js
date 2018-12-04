@@ -1,7 +1,8 @@
-const fs = require('fs');
+
 const path = require('path');
 const sprintf = require('sprintf-js').sprintf;
 const Promise = require('bluebird');
+const fs = Promise.promisifyAll(require('fs'));
 
 var counter = 0;
 
@@ -16,15 +17,21 @@ const zeroPaddedNumber = (num) => {
   return sprintf('%05d', num);
 };
 
+// const readCounter = (callback) => {
+//   Promise.promisify(fs.readFile)(exports.counterFile)
+//     .then(fileData => callback(null, Number(fileData)))
+//     .catch(err => callback(null, 0));
+// };
+
 const readCounter = (callback) => {
-  Promise.promisify(fs.readFile)(exports.counterFile)
+  fs.readFileAsync(exports.counterFile)
     .then(fileData => callback(null, Number(fileData)))
     .catch(err => callback(null, 0));
 };
 
 const writeCounter = (count, callback) => {
   var counterString = zeroPaddedNumber(count);
-  Promise.promisify(fs.writeFile)(exports.counterFile, counterString)
+  fs.writeFileAsync(exports.counterFile, counterString)
     .then(() => callback(null, counterString))
     .catch(err => callback(err, 'GRAAAH'));
 };
