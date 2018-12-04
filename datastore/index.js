@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
+const Promise = require('bluebird');
 
 var items = {};
 
@@ -10,34 +11,42 @@ var items = {};
 exports.create = (text, callback) => {
   counter.getNextUniqueId((err, id) => {
     let fileName = __dirname + '/data/' + id + '.txt';
-    //console.log('exports.create fileName: ', fileName);
-    fs.writeFile(fileName, text, (err) => {
-      if (err) {
-        throw ('error writing file: ', fileName);
-      } else {
-        callback(null, { id, text });
-      }
-    });
+
+    Promise.promisify(fs.writeFile)(fileName, text)
+      .then(() => callback(null, { id, text }))
+      .catch(err => callback(err, 'THIS ERROR MAKES YOU SAD'));
+
   });
-  // items[id] = text;
 };
 
 exports.readAll = (callback) => {
-  var data = [];
-  // console.log('Inside readAll');
+
+
   fs.readdir(__dirname + '/data', (err, files) => {
-    _.each(files, (file, index) => {
-      fs.readFile(__dirname + '/data/' + file, (err, fileData) => {
-        data.push({ id: file.slice(0, -4), text: fileData.toString() });
-        // console.log('---IN EACH--- Data: ', data);
-        if (index === files.length - 1) {
-          callback(null, data);
-        }
+    // var data = Array(files.length);
+    Promise.all(files.map((file, index) => {
+      Promise.promisify(fs.readFile)(__dirname + '/data/' + file)
+        .then(fileData => {
+          console.log('FILE DATA: ', fileData.toString());
+          console.log('FILE: ', file);
+          return ({ id: file.slice(0, -4), text: fileData.toString() });
+        })
+        .catch(err => callback(err));
+      //  (err, fileData) => {
+      //   data.push({ id: file.slice(0, -4), text: fileData.toString() });
+
+      //   if (index === files.length - 1) {
+      //     callback(null, data);
+      //   }
+      // });
+    }))
+      .then((data) => {
+        console.log('data: ', data);
+        callback(null, data);
       });
-    });
-    if (files.length === 0) {
-      callback(null, data);
-    }
+    // if (files.length === 0) {
+    //   callback(null, data);
+    // }
   });
 };
 

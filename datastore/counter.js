@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const sprintf = require('sprintf-js').sprintf;
+const Promise = require('bluebird');
 
 var counter = 0;
 
@@ -16,44 +17,27 @@ const zeroPaddedNumber = (num) => {
 };
 
 const readCounter = (callback) => {
-  // console.log('Inside readCounter');
-  fs.readFile(exports.counterFile, (err, fileData) => {
-    if (err) {
-      callback(null, 0);
-    } else {
-      callback(null, Number(fileData));
-    }
-  });
+  Promise.promisify(fs.readFile)(exports.counterFile)
+    .then(fileData => callback(null, Number(fileData)))
+    .catch(err => callback(null, 0));
 };
 
 const writeCounter = (count, callback) => {
-  // console.log('Inside writeCounter');
   var counterString = zeroPaddedNumber(count);
-  fs.writeFile(exports.counterFile, counterString, (err) => {
-    if (err) {
-      throw ('error writing counter');
-    } else {
-      callback(null, counterString);
-    }
-  });
+  Promise.promisify(fs.writeFile)(exports.counterFile, counterString)
+    .then(() => callback(null, counterString))
+    .catch(err => callback(err, 'GRAAAH'));
 };
 
 // Public API - Fix this function //////////////////////////////////////////////
 
 exports.getNextUniqueId = (callback) => {
-  // let counter;
-  // console.log('Inside getNextUniqueId -- Callback: ', callback);
   readCounter((err, number) => {
-
     number = number + 1 || 1;
     writeCounter(number, (err, counterString) => {
-      // call some function
       callback(null, counterString);
     });
   });
-  //counter = counter + 1;
-  //return zeroPaddedNumber(counter);
-  // return counter;
 };
 
 
