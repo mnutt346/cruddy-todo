@@ -9,7 +9,7 @@ var items = {};
 
 exports.create = (text, callback) => {
   counter.getNextUniqueId((err, id) => {
-    let fileName = __dirname + '/dataDir/' + id + '.txt';
+    let fileName = __dirname + '/data/' + id + '.txt';
     //console.log('exports.create fileName: ', fileName);
     fs.writeFile(fileName, text, (err) => {
       if (err) {
@@ -25,9 +25,9 @@ exports.create = (text, callback) => {
 exports.readAll = (callback) => {
   var data = [];
   // console.log('Inside readAll');
-  fs.readdir(__dirname + '/dataDir', (err, files) => {
+  fs.readdir(__dirname + '/data', (err, files) => {
     _.each(files, (file, index) => {
-      fs.readFile(__dirname + '/dataDir/' + file, (err, fileData) => {
+      fs.readFile(__dirname + '/data/' + file, (err, fileData) => {
         data.push({ id: file.slice(0, -4), text: fileData.toString() });
         // console.log('---IN EACH--- Data: ', data);
         if (index === files.length - 1) {
@@ -42,9 +42,9 @@ exports.readAll = (callback) => {
 };
 
 exports.readOne = (id, callback) => {
-  fs.readdir(__dirname + '/dataDir', (err, files) => {
+  fs.readdir(__dirname + '/data', (err, files) => {
     if (files.includes(id + '.txt')) {
-      fs.readFile(__dirname + '/dataDir/' + id + '.txt', (err, fileData) => {
+      fs.readFile(__dirname + '/data/' + id + '.txt', (err, fileData) => {
         callback(null, { id, text: fileData.toString() });
       });
     } else {
@@ -54,9 +54,9 @@ exports.readOne = (id, callback) => {
 };
 
 exports.update = (id, text, callback) => {
-  fs.readdir(__dirname + '/dataDir', (err, files) => {
+  fs.readdir(__dirname + '/data', (err, files) => {
     if (files.includes(id + '.txt')) {
-      fs.writeFile(__dirname + '/dataDir/' + id + '.txt', text, (err) => {
+      fs.writeFile(__dirname + '/data/' + id + '.txt', text, (err) => {
         callback(null, { id, text });
       });
     } else {
@@ -66,9 +66,9 @@ exports.update = (id, text, callback) => {
 };
 
 exports.delete = (id, callback) => {
-  fs.readdir(__dirname + '/dataDir', (err, files) => {
+  fs.readdir(__dirname + '/data', (err, files) => {
     if (files.includes(id + '.txt')) {
-      fs.unlink(__dirname + '/dataDir/' + id + '.txt', (err) => {
+      fs.unlink(__dirname + '/data/' + id + '.txt', (err) => {
         callback();
       });
     } else {

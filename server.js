@@ -32,7 +32,6 @@ app.post('/todo', (req, res) => {
 // Read all (cRud) -- collection route
 app.get('/todo', (req, res) => {
   Todo.readAll((err, todos) => {
-    console.log('Inside the express app.get Todo.readAll');
     if (err) {
       res.sendStatus(400);
     } else {
