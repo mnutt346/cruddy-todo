@@ -25,28 +25,11 @@ exports.readAll = (callback) => {
   fs.readdir(__dirname + '/data', (err, files) => {
     // var data = Array(files.length);
     Promise.all(files.map((file, index) => {
-      Promise.promisify(fs.readFile)(__dirname + '/data/' + file)
-        .then(fileData => {
-          console.log('FILE DATA: ', fileData.toString());
-          console.log('FILE: ', file);
-          return ({ id: file.slice(0, -4), text: fileData.toString() });
-        })
+      return Promise.promisify(fs.readFile)(__dirname + '/data/' + file)
+        .then(fileData => ({ id: file.slice(0, -4), text: fileData.toString() }))
         .catch(err => callback(err));
-      //  (err, fileData) => {
-      //   data.push({ id: file.slice(0, -4), text: fileData.toString() });
-
-      //   if (index === files.length - 1) {
-      //     callback(null, data);
-      //   }
-      // });
     }))
-      .then((data) => {
-        console.log('data: ', data);
-        callback(null, data);
-      });
-    // if (files.length === 0) {
-    //   callback(null, data);
-    // }
+      .then((data) => callback(null, data));
   });
 };
 
